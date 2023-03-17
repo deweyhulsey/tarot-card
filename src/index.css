@@ -68,3 +68,11 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.card img {
+  transition: all 0.2s;
+}
+
+.card img:hover {
+    transform: rotateY(-10deg) rotateX(40deg);
+}

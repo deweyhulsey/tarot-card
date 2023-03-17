@@ -1,38 +1,65 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 
+
+
 function App() {
   const [count, setCount] = useState(0);
+  const [deck, setDeck] = useState({});
+  const [hand, setHand] = useState({});
+
+  useEffect(() => {
+    fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
+    .then((response) => response.json())
+    .then((data) => {
+      setDeck(data);
+      setCount(data.remaining);
+    })
+    .catch((err) => {
+      console.log(err.message);
+    })
+  }, []);
+
+  function Card({card}) {
+    return(
+        <>
+            <div className="card">
+                <h1>{card.value} of {card.suit}</h1>
+                <img
+                    className="card-img"
+                    src={card.image}
+                    alt={'Photo of ' + card.value}
+                    style={{
+                        // backgroundColor: 'blue',
+                    }}
+                />
+            </div>
+        </>
+    )
+  }
+
+  function drawCard(deck) {
+    fetch(`https://deckofcardsapi.com/api/deck/${deck}/draw/?count=1`)
+    .then((response) => response.json())
+    .then((data) => {
+      setHand(data.cards[0]);
+      console.log(hand);
+    });
+  }
 
   return (
     <div className="App">
-      <div>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-      </div>
-      <h1>Tarot Card</h1>
-      <h2>Mysticism Online</h2>
+      <h1>Draw a card</h1>
+      <Card card={hand} />
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button onClick={() => {
+          setCount((count) => count - 1);
+          drawCard(deck.deck_id);
+        }}>
           count is {count}
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR.
-        </p>
-
-        <p>
-          Tip: you can use the inspector button next to address bar to click on
-          components in the preview and open the code in the editor!
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </div>
   );
 }
